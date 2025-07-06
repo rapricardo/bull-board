@@ -1,20 +1,20 @@
-const express = require('express');
-const { createBullBoard } = require('bull-board');
-const { BullMQAdapter } = require('bull-board/bullMQAdapter');
-const { Queue } = require('bullmq');
-const Redis = require('ioredis');
+const express = require("express");
+const { createBullBoard } = require("@bull-board/api");
+const { BullAdapter } = require("@bull-board/api/bullAdapter");
+const { ExpressAdapter } = require("@bull-board/express");
 
+const Queue = require("bull");
 const app = express();
-const redisConnection = new Redis({ host: 'redis' });
+const serverAdapter = new ExpressAdapter();
 
-const queue = new Queue('n8n-jobs', { connection: redisConnection });
+const queue = new Queue("webhookQueue", { redis: { host: "redis" } });
 
-const { router } = createBullBoard([
-  new BullMQAdapter(queue)
-]);
-
-app.use('/dashboard', router);
-
-app.listen(3000, () => {
-  console.log('Bull-board disponível em http://localhost:3000/dashboard');
+createBullBoard({
+  queues: [new BullAdapter(queue)],
+  serverAdapter,
 });
+
+serverAdapter.setBasePath("/dashboard");
+app.use("/dashboard", serverAdapter.getRouter());
+
+app.listen(3000, () => console.log("Dashboard disponível em /dashboard"));
