@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "dependencies": {
-    "bull-board": "^4.10.2",
+    "bull-board": "^4.9.1",
     "express": "^4.18.2",
     "ioredis": "^5.3.1"
   }
